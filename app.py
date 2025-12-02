@@ -32,7 +32,7 @@ if uploaded_file is not None:
     st.components.v1.html(html_content, height=700, width=900, scrolling=True)
 
     st.subheader(":gear: Controles:")
-    st.write("Rotar: Click derecho")
+    st.write("Rotar: Click izquierdo")
     st.write("Zoom: Shift + Click derecho o Scroll")
     st.write("Movimiento: Control + Click derecho")
     st.write("Utiliza el menu para cambiar la representación molecular.")
