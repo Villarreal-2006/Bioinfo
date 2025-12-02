@@ -49,7 +49,7 @@ if uploaded_file is not None:
         'Organismo': 'No disponible'
     }
     if file_extension == 'pdb':
-        title=re.search(r"^TITLE\s+(.+)", file_data, re.MULTILINE)
+        title_match=re.search(r"^TITLE\s+(.+)", file_data, re.MULTILINE)
         if title_match:
             protein_info["Título/Descripción"] = title_match.group(1).strip()
         else:
@@ -57,7 +57,7 @@ if uploaded_file is not None:
             if header_match:
                 protein_info["Título/Descripción"] = header_match.group(1).strip()
 
-        compnd_lines = re.findall(r"^COMPND\s+\d+\s*(.+)", file_data, re.MULTILINE)
+        compnd_lines = re.findall(r"^COMPND\s+\d*\s*(.+)", file_data, re.MULTILINE)
         if compnd_lines:
             full_compnd_text = " ".join(compnd_lines)
             molecule_match = re.search(r"MOLECULE:\s*([^;]+)", full_compnd_text, re.IGNORECASE)
@@ -74,28 +74,40 @@ if uploaded_file is not None:
         if expdta_match:
             protein_info["Método Experimental"] = expdta_match.group(1).strip()
 
-        source_org_scientific_match = re.search(r"ORGANISM_SCIENTIFIC:\s*([^;\n]+)", file_data, re.MULTILINE)
-        if source_org_scientific_match:
-            protein_info["Organismo"] = source_org_scientific_match.group(1).strip()
-        else:
-            source_lines = re.findall(r"^SOURCE\s+\d+\s*(.+)", file_data, re.MULTILINE)
-            if source_lines:
-                full_source_text = " ".join(source_lines)
-                organism_match = re.search(r"ORGANISM:\s*([^;\n]+)", full_source_text, re.IGNORECASE)
-                if organism_match:
-                    protein_info["Organismo"] = organism_match.group(1).strip()
-                else:
-                    if len(source_lines[0].split()) > 1:
-                        protein_info["Organismo"] = source_lines[0].split(';')[0].strip()
+        organism_found = False
+        source_lines = re.findall(r"^SOURCE\s+\d*\s*(.+)", file_data, re.MULTILINE)
+        if source_lines:
+            full_source_text = " ".join(source_lines)
+            organism_match = re.search(r"ORGANISM:\s*([^;\n]+)", full_source_text, re.IGNORECASE)
+            if organism_match:
+                protein_info["Organismo"] = organism_match.group(1).strip()
+                organism_found = True
+            else:
+                first_source_line_parts = source_lines[0].split(';')
+                if first_source_line_parts:
+                    candidate_organism = first_source_line_parts[0].strip()
+                    if candidate_organism and "MOLECULE" not in candidate_organism.upper():
+                        protein_info["Organismo"] = candidate_organism
+                        organism_found = True
 
     elif file_extension == "cif":
         def get_cif_value(data, tag):
             match_multi = re.search(rf"^{tag}\n;\n(.+?)\n;\n", data, re.DOTALL | re.MULTILINE)
             if match_multi:
-                return match_multi.group(1).strip()
-            match_single = re.search(rf"^{tag}\s+['\"]?([^'\"\n]+)['\"]?", data, re.MULTILINE)
+                value = match_multi.group(1).strip()
+                if not value.startswith('_'):
+                    return value
+                else:
+                    return "No disponible"
+            match_single = re.search(rf"^{tag}\s+(['\"]?)(.+?)\1(?=\s*#|\s*$|\s+_\S+)", data, re.MULTILINE)
+            
             if match_single:
-                return match_single.group(1).strip()
+                value = match_single.group(2).strip()
+                if not value.startswith('_') or value == tag:
+                    return value
+                else:
+                    return "No disponible"
+
             return "No disponible"
 
         protein_info["Título/Descripción"] = get_cif_value(file_data, "_struct.title")
