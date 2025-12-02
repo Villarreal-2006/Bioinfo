@@ -36,7 +36,6 @@ if uploaded_file is not None:
     st.write("Zoom: Shift + Click derecho o Scroll")
     st.write("Movimiento: Control + Click derecho")
     st.write("Utiliza el menu para cambiar la representación molecular.")
-    st.write("Opcion de incluir los átomos de hidrogeno en la visualización.")
 
     st.subheader(":page_facing_up: Vista previa del archivo:")
     st.code("\n".join(file_data.split("\n")[:20]))
