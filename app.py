@@ -54,7 +54,7 @@ else:
         'Organismo': 'No disponible'
     }
     if file_extension == 'pdb':
-        title=re.search(r'"^TITLE\s+(.+)", file_data, re.MULTILINE)
+        title=re.search(r"^TITLE\s+(.+)", file_data, re.MULTILINE)
         if title_match:
             protein_info["Título/Descripción"] = title_match.group(1).strip()
         else:
