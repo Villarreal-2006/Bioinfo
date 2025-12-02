@@ -1,0 +1,4 @@
+py3Dmol==2.4.2
+streamlit==1.42.0
+streamlit
+visualizer
