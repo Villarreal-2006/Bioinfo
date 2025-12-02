@@ -51,7 +51,7 @@ else:
         'Nombre de la molécula': 'No disponible', 
         'Clasificación/Palabras clave': 'No disponible', 
         'Método experimental': 'No disponible',
-        'Organismo': 'No disponible
+        'Organismo': 'No disponible'
     }
     if file_extension == 'pdb':
         title=re.search(r'"^TITLE\s+(.+)", file_data, re.MULTILINE)
