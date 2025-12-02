@@ -25,9 +25,5 @@ class ProteinVisualizer:
             view.setStyle({"sphere": {}})
         else:
             raise ValueError(f"Estilo sin soporte: {style}. Escoga 'cartoon', 'stick', or 'sphere'.")
-
-        # Zoom in on the structure and render it
         view.zoomTo(1.5)
-
-        # Return the HTML content for rendering
         return view._make_html()
