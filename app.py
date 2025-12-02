@@ -44,7 +44,7 @@ if uploaded_file is not None:
     st.code("\n".join(file_data.split("\n")[:20]))  # Show first 20 lines
 
 else:
-    st.subheader(":backhand_index_pointing_right: What are those files?")
+    st.subheader(":backhand: What are those files?")
     st.write("""
         Prot-View can work with both formats and gives the option to convert the data between them.
         \n
