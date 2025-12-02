@@ -2,20 +2,20 @@
 import streamlit as st
 from visualizador import ProteinVisualizer
 
-st.set_page_config(page_title="Prot-View | A BioApps Tool", page_icon=":microscope:")
+st.set_page_config(page_title="Visualizador de proteínas - Bioinformática", page_icon=":microscope:")
 
-st.title(":microscope: ProtView | A BioApps Tool")
-st.write("Upload a **CIF or PDB file** to visualize its molecular structure.")
+st.title(":microscope: Visualizador de proteínas - Bioinformática")
+st.write("Sube el archivo **CIF o PDB** para visualizar su estructura molecular.")
 
 # File uploader to handle both PDB and CIF files
-uploaded_file = st.file_uploader("Upload a PDB or CIF file", type=["pdb", "cif"])
+uploaded_file = st.file_uploader("Sube el archivo PDB o CIF", type=["pdb", "cif"])
 
 if uploaded_file is not None:
     file_extension = uploaded_file.name.split('.')[-1]
     file_data = uploaded_file.read().decode("utf-8")
 
     # 3D Molecular Visualization
-    st.subheader(":dna: 3D Molecular Visualization:")
+    st.subheader(":dna: Visualización 3D:")
 
     # Dropdown for visualization style
     style_options = ["Cartoon", "Stick", "Sphere"]
@@ -32,12 +32,12 @@ if uploaded_file is not None:
     st.components.v1.html(html_content, height=700, width=900, scrolling=True)
 
     # Controls Section
-    st.subheader(":gear: Controls:")
-    st.write("Rotate: Left Click")
-    st.write("Zoom: Shift + Left Click or Scroll")
-    st.write("Move: Control + Left Click")
-    st.write("Use the dropdown menu to change the molecular representation.")
-    st.write("Check the box to include hydrogen atoms in the visualization.")
+    st.subheader(":gear: Controles:")
+    st.write("Rotar: Click derecho")
+    st.write("Zoom: Shift + Click derecho o Scroll")
+    st.write("Movimiento: Control + Click derecho")
+    st.write("Utiliza el menu para cambiar la representación molecular.")
+    st.write("Opcion de incluir los átomos de hidrogeno en la visualización.")
 
     # Display file preview
     st.subheader(":page_facing_up: File Preview:")
