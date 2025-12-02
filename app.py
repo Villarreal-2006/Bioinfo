@@ -46,7 +46,7 @@ if uploaded_file is not None:
 
 else:
     st.subheader(":card_index_dividers: Información de la proteína")
-    protein:info = {
+    protein_info = {
         'Título/Descripción': 'No disponible', 
         'Nombre de la molécula': 'No disponible', 
         'Clasificación/Palabras clave': 'No disponible', 
