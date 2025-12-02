@@ -27,12 +27,10 @@ if uploaded_file is not None:
         horizontal=True
     )
 
-    # Generate HTML visualization using ProteinVisualizer class
     visualizer = ProteinVisualizer(file_data, file_extension)
     html_content = visualizer.generate_visualization(style=style)
     st.components.v1.html(html_content, height=700, width=900, scrolling=True)
 
-    # Controls Section
     st.subheader(":gear: Controles:")
     st.write("Rotar: Click derecho")
     st.write("Zoom: Shift + Click derecho o Scroll")
@@ -40,11 +38,9 @@ if uploaded_file is not None:
     st.write("Utiliza el menu para cambiar la representación molecular.")
     st.write("Opcion de incluir los átomos de hidrogeno en la visualización.")
 
-    # Display file preview
     st.subheader(":page_facing_up: Vista previa del archivo:")
     st.code("\n".join(file_data.split("\n")[:20]))
 
-else:
     st.subheader(":card_index_dividers: Información de la proteína")
     protein_info = {
         'Título/Descripción': 'No disponible', 
@@ -118,4 +114,9 @@ else:
 
     for key, value in protein_info.items():
         st.write(f"**{key}:** {value}")
+else:
+    st.subheader("Proyecto final - Bioinformática")
+    st.write("""
+        Realizado por Diana Mariella Villarreal Lopez & Jose Eduardo Mungaray Martinez
+    """)
         
