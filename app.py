@@ -1,11 +1,6 @@
 
-import requests
-from Bio.PDB.MMCIF2Dict import MMCIF2Dict
-import io
 import streamlit as st
 from visualizador import ProteinVisualizer
-import re
-import json
 
 st.set_page_config(page_title="Visualizador de proteínas - Bioinformática", page_icon=":microscope:")
 
