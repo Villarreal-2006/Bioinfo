@@ -44,7 +44,7 @@ if uploaded_file is not None:
         pdb_parser = PDBParser()
         try:
             structure = pdb_parser.get_structure('protein', uploaded_file)
-            st.write(f"Successfully parsed PDB file: {pdb_file_name}")
+            st.write(f"Successfully parsed PDB file: {uploaded_file}")
             st.write(f"Numero de modelos: {len(structure)}")
             for model in structure:
                 st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
@@ -58,7 +58,7 @@ if uploaded_file is not None:
         cif_parser = MMCIFParser()
         try:
             structure_cif = cif_parser.get_structure('protein_cif', uploaded_file)
-            st.write(f"Successfully parsed CIF file: {cif_file_name}")
+            st.write(f"Successfully parsed CIF file: {uploaded_file}")
             st.write(f"Numero de modelos: {len(structure_cif)}")
             for model in structure_cif:
                 st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
