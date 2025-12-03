@@ -11,7 +11,6 @@ st.set_page_config(page_title="Visualizador de proteínas - Bioinformática", pa
 st.title(":microscope: Visualizador de proteínas - Bioinformática")
 st.write("Sube el archivo **CIF o PDB** para visualizar su estructura molecular.")
 
-# File uploader to handle both PDB and CIF files
 uploaded_file = st.file_uploader("Sube el archivo PDB o CIF", type=["pdb", "cif"])
 
 if uploaded_file is not None:
@@ -45,14 +44,12 @@ if uploaded_file is not None:
     
     file_extension = os.path.splitext(uploaded_file.name)[1].lower()
 
-    # Create a temporary directory and save the uploaded file
     with tempfile.TemporaryDirectory() as tmpdir:
         file_path = os.path.join(tmpdir, uploaded_file.name)
         with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
         st.sidebar.success(f'Analizado y guardado con éxito: {uploaded_file.name}')
 
-        # Parse PDB file if extension is .pdb
         if file_extension == '.pdb':
             pdb_parser = PDBParser()
             try:
@@ -66,7 +63,6 @@ if uploaded_file is not None:
             except Exception as e:
                 st.error(f"Error: {e}")
 
-        # Parse CIF file if extension is .cif
         elif file_extension == '.cif':
             cif_parser = MMCIFParser()
             try:
