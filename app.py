@@ -51,41 +51,41 @@ if uploaded_file is not None:
         file_path = os.path.join(tmpdir, uploaded_file.name)
         with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
-        st.success(f'Successfully uploaded and saved: {uploaded_file.name}')
+        st.success(f'Analizado y guardado con éxito: {uploaded_file.name}')
 
         # Parse PDB file if extension is .pdb
         if file_extension == '.pdb':
-            st.subheader(f'Parsing PDB file: {uploaded_file.name}')
+            st.subheader(f'Analizando archivo PDB: {uploaded_file.name}')
             pdb_parser = PDBParser()
             try:
                 structure = pdb_parser.get_structure('protein', file_path)
-                st.write(f"Successfully parsed PDB file: {uploaded_file.name}")
-                st.write(f"Number of models: {len(structure)}")
+                st.write(f"Analisis con éxito del PDB: {uploaded_file.name}")
+                st.write(f"Numero de modelos: {len(structure)}")
                 for model in structure:
-                    st.write(f"  Model ID: {model.id}, Number of chains: {len(model)}")
+                    st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
                     for chain in model:
-                        st.write(f"    Chain ID: {chain.id}, Number of residues: {len(chain)}")
+                        st.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
 
             except Exception as e:
-                st.error(f"An error occurred while parsing the PDB file: {e}")
+                st.error(f"Error: {e}")
 
         # Parse CIF file if extension is .cif
         elif file_extension == '.cif':
-            st.subheader(f'Parsing CIF file: {uploaded_file.name}')
+            st.subheader(f'Analizando archivo CIF: {uploaded_file.name}')
             cif_parser = MMCIFParser()
             try:
                 structure_cif = cif_parser.get_structure('protein_cif', file_path)
-                st.write(f"Successfully parsed CIF file: {uploaded_file.name}")
+                st.write(f"Analisis con éxito del CIF: {uploaded_file.name}")
                 st.write(f"Number of models: {len(structure_cif)}")
                 for model in structure_cif:
-                    st.write(f"  Model ID: {model.id}, Number of chains: {len(model)}")
+                    st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
                     for chain in model:
-                        st.write(f"    Chain ID: {chain.id}, Number of residues: {len(chain)}")
+                        st.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
 
             except Exception as e:
-                st.error(f"An error occurred while parsing the CIF file: {e}")
+                st.error(f"Error: {e}")
         else:
-            st.warning("Unsupported file type. Please upload a .pdb or .cif file.")
+            st.warning("Por favor vuelva a ingresar el archivo. Tiene que ser del tipo PBD y CIF.")
 else:
     st.write("""
         Realizado por Diana Mariella Villarreal Lopez & Jose Eduardo Mungaray Martinez
