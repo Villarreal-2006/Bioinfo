@@ -38,7 +38,7 @@ if uploaded_file is not None:
     st.write("Utiliza el menu para cambiar la representación molecular.")
 
     st.sidebar.subheader(":page_facing_up: Vista previa del archivo:")
-    st.sidebar.code("\n".join(file_data.split("\n")))
+    st.sidebar.code("\n".join(file_data.split("\n"))(:30))
     
     st.subheader('Información de la proteína')
     
