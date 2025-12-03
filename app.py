@@ -41,6 +41,7 @@ if uploaded_file is not None:
     
     st.subheader('Información de la proteína')
     if file_extension== 'pdb':
+        pdb_parser = PDBParser()
         try:
             structure = pdb_parser.get_structure('protein', uploaded_file)
             st.write(f"Successfully parsed PDB file: {pdb_file_name}")
@@ -54,6 +55,7 @@ if uploaded_file is not None:
         except Exception as e:
             st.write(f"Error: {e}")
     elif file_extension == "cif":
+        cif_parser = MMCIFParser()
         try:
             structure_cif = cif_parser.get_structure('protein_cif', uploaded_file)
             st.write(f"Successfully parsed CIF file: {cif_file_name}")
