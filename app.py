@@ -11,7 +11,7 @@ st.set_page_config(page_title="Visualizador de proteínas - Bioinformática", pa
 st.title(":microscope: Visualizador de proteínas - Bioinformática")
 st.write("Sube el archivo **CIF o PDB** para visualizar su estructura molecular.")
 
-uploaded_file = st.file_uploader('Selecciona:", type=["pdb", "cif"])
+uploaded_file = st.file_uploader("Selecciona:", type=["pdb", "cif"])
 
 if uploaded_file is not None:
     file_extension = uploaded_file.name.split('.')[-1]
