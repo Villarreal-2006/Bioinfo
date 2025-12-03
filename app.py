@@ -40,7 +40,7 @@ if uploaded_file is not None:
     st.subheader(":page_facing_up: Vista previa del archivo:")
     st.sidebar.code("\n".join(file_data.split("\n")))
     
-    st.subheader('Información de la proteína')
+    st.sidebar.subheader('Información de la proteína')
     
     file_extension = os.path.splitext(uploaded_file.name)[1].lower()
 
