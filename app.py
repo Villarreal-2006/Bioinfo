@@ -71,7 +71,7 @@ if uploaded_file is not None:
                 for model in structure_cif:
                     st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
                     for chain in model:
-                        st.sidebar.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
+                        st.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
 
             except Exception as e:
                 st.error(f"Error: {e}")
