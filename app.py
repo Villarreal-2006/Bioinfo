@@ -3,6 +3,8 @@ import streamlit as st
 from visualizador import ProteinVisualizer
 from Bio.PDB import PDBParser
 from Bio.PDB import MMCIFParser
+import os
+import tempfile
 
 st.set_page_config(page_title="Visualizador de proteínas - Bioinformática", page_icon=":microscope:")
 
@@ -40,35 +42,50 @@ if uploaded_file is not None:
     st.code("\n".join(file_data.split("\n")[:20]))
     
     st.subheader('Información de la proteína')
-    if file_extension== 'pdb':
-        pdb_parser = PDBParser()
-        try:
-            structure = pdb_parser.get_structure('protein', uploaded_file)
-            st.write(f"Successfully parsed PDB file: {uploaded_file}")
-            st.write(f"Numero de modelos: {len(structure)}")
-            for model in structure:
-                st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
-                for chain in model:
-                    st.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
-        except FileNotFoundError:
-            st.write(f"Error: Archivo PDB '{pdb_file_name}' no encontrado")
-        except Exception as e:
-            st.write(f"Error: {e}")
-    elif file_extension == "cif":
-        cif_parser = MMCIFParser()
-        try:
-            structure_cif = cif_parser.get_structure('protein_cif', uploaded_file)
-            st.write(f"Successfully parsed CIF file: {uploaded_file}")
-            st.write(f"Numero de modelos: {len(structure_cif)}")
-            for model in structure_cif:
-                st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
-                for chain in model:
-                    st.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
-        
-        except FileNotFoundError:
-            st.write(f"Error: Archivo CIF '{cif_file_name}' no encontrado.")
-        except Exception as e:
-            st.write(f"Error: {e}")
+    
+    # Get the file extension to determine the parser
+    file_extension = os.path.splitext(uploaded_file.name)[1].lower()
+
+    # Create a temporary directory and save the uploaded file
+    with tempfile.TemporaryDirectory() as tmpdir:
+        file_path = os.path.join(tmpdir, uploaded_file.name)
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        st.success(f'Successfully uploaded and saved: {uploaded_file.name}')
+
+        # Parse PDB file if extension is .pdb
+        if file_extension == '.pdb':
+            st.subheader(f'Parsing PDB file: {uploaded_file.name}')
+            pdb_parser = PDBParser()
+            try:
+                structure = pdb_parser.get_structure('protein', file_path)
+                st.write(f"Successfully parsed PDB file: {uploaded_file.name}")
+                st.write(f"Number of models: {len(structure)}")
+                for model in structure:
+                    st.write(f"  Model ID: {model.id}, Number of chains: {len(model)}")
+                    for chain in model:
+                        st.write(f"    Chain ID: {chain.id}, Number of residues: {len(chain)}")
+
+            except Exception as e:
+                st.error(f"An error occurred while parsing the PDB file: {e}")
+
+        # Parse CIF file if extension is .cif
+        elif file_extension == '.cif':
+            st.subheader(f'Parsing CIF file: {uploaded_file.name}')
+            cif_parser = MMCIFParser()
+            try:
+                structure_cif = cif_parser.get_structure('protein_cif', file_path)
+                st.write(f"Successfully parsed CIF file: {uploaded_file.name}")
+                st.write(f"Number of models: {len(structure_cif)}")
+                for model in structure_cif:
+                    st.write(f"  Model ID: {model.id}, Number of chains: {len(model)}")
+                    for chain in model:
+                        st.write(f"    Chain ID: {chain.id}, Number of residues: {len(chain)}")
+
+            except Exception as e:
+                st.error(f"An error occurred while parsing the CIF file: {e}")
+        else:
+            st.warning("Unsupported file type. Please upload a .pdb or .cif file.")
 else:
     st.write("""
         Realizado por Diana Mariella Villarreal Lopez & Jose Eduardo Mungaray Martinez
