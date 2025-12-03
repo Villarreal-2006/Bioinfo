@@ -55,7 +55,7 @@ if uploaded_file is not None:
 
         # Parse PDB file if extension is .pdb
         if file_extension == '.pdb':
-            st.subheader(f'Analizando archivo PDB: {uploaded_file.name}')
+            st.write(f'Analizando archivo PDB: {uploaded_file.name}')
             pdb_parser = PDBParser()
             try:
                 structure = pdb_parser.get_structure('protein', file_path)
@@ -71,7 +71,7 @@ if uploaded_file is not None:
 
         # Parse CIF file if extension is .cif
         elif file_extension == '.cif':
-            st.subheader(f'Analizando archivo CIF: {uploaded_file.name}')
+            st.write(f'Analizando archivo CIF: {uploaded_file.name}')
             cif_parser = MMCIFParser()
             try:
                 structure_cif = cif_parser.get_structure('protein_cif', file_path)
