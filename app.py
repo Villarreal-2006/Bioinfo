@@ -37,10 +37,10 @@ if uploaded_file is not None:
     st.write("Movimiento: Control + Click izquierdo")
     st.write("Utiliza el menu para cambiar la representación molecular.")
 
-    st.subheader(":page_facing_up: Vista previa del archivo:")
+    st.sidebar.subheader(":page_facing_up: Vista previa del archivo:")
     st.sidebar.code("\n".join(file_data.split("\n")))
     
-    st.sidebar.subheader('Información de la proteína')
+    st.subheader('Información de la proteína')
     
     file_extension = os.path.splitext(uploaded_file.name)[1].lower()
 
