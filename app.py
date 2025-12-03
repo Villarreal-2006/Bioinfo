@@ -39,7 +39,6 @@ if uploaded_file is not None:
     st.subheader(":page_facing_up: Vista previa del archivo:")
     st.code("\n".join(file_data.split("\n")[:20]))
 else:
-    st.subheader("Proyecto final - Bioinformática")
     st.write("""
         Realizado por Diana Mariella Villarreal Lopez & Jose Eduardo Mungaray Martinez
     """)
