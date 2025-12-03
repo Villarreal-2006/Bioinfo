@@ -1,7 +1,11 @@
 
+import requests
+from Bio.PDB.MMCIF2Dict import MMCIF2Dict
+import io
 import streamlit as st
 from visualizador import ProteinVisualizer
 import re
+import json
 
 st.set_page_config(page_title="Visualizador de proteínas - Bioinformática", page_icon=":microscope:")
 
@@ -49,82 +53,105 @@ if uploaded_file is not None:
         'Organismo': 'No disponible'
     }
     if file_extension == 'pdb':
-        title_match=re.search(r"^TITLE\s+(.+)", file_data, re.MULTILINE)
-        if title_match:
-            protein_info["Título/Descripción"] = title_match.group(1).strip()
-        else:
-            header_match = re.search(r"^HEADER\s+(.+)", file_data, re.MULTILINE)
-            if header_match:
-                protein_info["Título/Descripción"] = header_match.group(1).strip()
+        pdb_id_match = re.search(r'HEADER\s+.*?\s+([A-Z0-9]{4})', file_data)
+        pdb_id = None
+        if pdb_id_match:
+            pdb_id = pdb_id_match.group(1)
+            st.write(f"Detected PDB ID: {pdb_id}") # For debugging
 
-        compnd_lines = re.findall(r"^COMPND\s+\d*\s*(.+)", file_data, re.MULTILINE)
-        if compnd_lines:
-            full_compnd_text = " ".join(compnd_lines)
-            molecule_match = re.search(r"MOLECULE:\s*([^;]+)", full_compnd_text, re.IGNORECASE)
-            if molecule_match:
-                protein_info["Nombre de la Molécula"] = molecule_match.group(1).strip()
-            elif "PROTEIN" in full_compnd_text.upper():
-                protein_info["Nombre de la Molécula"] = "Proteína"
+        if pdb_id:
+            api_url = f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id}"
+            try:
+                response = requests.get(api_url)
+                response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+                data = response.json()
 
-        keywds_match = re.search(r"^KEYWDS\s+(.+)", file_data, re.MULTILINE)
-        if keywds_match:
-            protein_info["Clasificación/Palabras Clave"] = keywds_match.group(1).strip()
+                # Extract information and update dictionary
+                protein_info['Título/Descripción'] = data.get('rcsb_entry_container_identifiers', {}).get('entry_title', 'No disponible')
 
-        expdta_match = re.search(r"^EXPDTA\s+(.+)", file_data, re.MULTILINE)
-        if expdta_match:
-            protein_info["Método Experimental"] = expdta_match.group(1).strip()
+                # Molecule Name - trying to get from entity_macromolecule or reference_entity_identifiers
+                molecule_name = 'No disponible'
+                if 'entity_macromolecule' in data and len(data['entity_macromolecule']) > 0:
+                    molecule_name = data['entity_macromolecule'][0].get('chem_comp_name', 'No disponible')
+                elif 'rcsb_entry_container_identifiers' in data and 'reference_entity_identifiers' in data['rcsb_entry_container_identifiers'] and len(data['rcsb_entry_container_identifiers']['reference_entity_identifiers']) > 0:
+                    molecule_name = data['rcsb_entry_container_identifiers']['reference_entity_identifiers'][0].get('chem_comp_name', 'No disponible')
+                protein_info['Nombre de la molécula'] = molecule_name
 
-        organism_found = False
-        source_lines = re.findall(r"^SOURCE\s+\d*\s*(.+)", file_data, re.MULTILINE)
-        if source_lines:
-            full_source_text = " ".join(source_lines)
-            organism_match = re.search(r"ORGANISM:\s*([^;\n]+)", full_source_text, re.IGNORECASE)
-            if organism_match:
-                protein_info["Organismo"] = organism_match.group(1).strip()
-                organism_found = True
-            else:
-                first_source_line_parts = source_lines[0].split(';')
-                if first_source_line_parts:
-                    candidate_organism = first_source_line_parts[0].strip()
-                    if candidate_organism and "MOLECULE" not in candidate_organism.upper():
-                        protein_info["Organismo"] = candidate_organism
-                        organism_found = True
+                protein_info['Clasificación/Palabras clave'] = ', '.join(data.get('rcsb_entry_info', {}).get('keywords', ['No disponible']))
+                protein_info['Método experimental'] = data.get('exptl', [{}])[0].get('method', 'No disponible')
 
+                # Organism - trying to get from organism_scientific or organism_common
+                organism = 'No disponible'
+                if 'entity' in data and len(data['entity']) > 0 and 'rcsb_macromolecular_info' in data['entity'][0]:
+                    organism = data['entity'][0]['rcsb_macromolecular_info'].get('organism_scientific', data['entity'][0]['rcsb_macromolecular_info'].get('organism_common', 'No disponible'))
+                protein_info['Organismo'] = organism
+
+            except requests.exceptions.RequestException as e:
+                st.warning(f"Error fetching PDB info from API: {e}")
+            except json.JSONDecodeError:
+                st.warning("Error decoding JSON from PDB API response.")
+            except IndexError: # Catch errors for list indexing if data structure is unexpected
+                st.warning("Unexpected data structure from PDB API response (IndexError).")
+            except KeyError: # Catch errors for dictionary key access if data structure is unexpected
+                st.warning("Unexpected data structure from PDB API response (KeyError).")
+
+        # Fallback to regex-based parsing if API failed or no PDB ID was found
+        if protein_info['Título/Descripción'] == 'No disponible':
+            protein_info['Título/Descripción'] = get_pdb_regex_info(file_data, r"TITLE\s*(.*)")
+
+        if protein_info['Nombre de la molécula'] == 'No disponible':
+            molecule_name_regex = get_pdb_regex_info(file_data, r"COMPND.*?MOL_ID:\s*\d+;\s*MOLECULE:\s*(.*?)(?:;\s*|\n)")
+            if molecule_name_regex == 'No disponible': # Simpler fallback if the first regex doesn't work
+                molecule_name_regex = get_pdb_regex_info(file_data, r"COMPND\s*(.*?)")
+            protein_info['Nombre de la molécula'] = molecule_name_regex
+
+        if protein_info['Clasificación/Palabras clave'] == 'No disponible':
+            protein_info['Clasificación/Palabras clave'] = get_pdb_regex_info(file_data, r"KEYWDS\s*(.*)")
+
+        if protein_info['Método experimental'] == 'No disponible':
+            protein_info['Método experimental'] = get_pdb_regex_info(file_data, r"EXPTL\s*METHOD\s*:\s*(.*)")
+
+        if protein_info['Organismo'] == 'No disponible':
+            organism_scientific_regex = get_pdb_regex_info(file_data, r"SOURCE.*?ORGANISM_SCIENTIFIC:\s*(.*?)(?:;\s*|\n)")
+            if organism_scientific_regex == 'No disponible':
+                organism_scientific_regex = get_pdb_regex_info(file_data, r"SOURCE.*?ORGANISM:\s*(.*?)(?:;\s*|\n)")
+            protein_info['Organismo'] = organism_scientific_regex
     elif file_extension == "cif":
-        def get_cif_value(data, tag):
-            match_multi = re.search(rf"^{tag}\n;\n(.+?)\n;\n", data, re.DOTALL | re.MULTILINE)
-            if match_multi:
-                value = match_multi.group(1).strip()
-                if not value.startswith('_'):
-                    return value
-                else:
-                    return "No disponible"
-            match_single = re.search(rf"^{tag}\s+(['\"]?)(.+?)\1(?=\s*#|\s*$|\s+_\S+)", data, re.MULTILINE)
+        try:
+            # Use io.StringIO to parse the string data
+            cif_io = io.StringIO(file_data)
+            cif_dict_data = MMCIF2Dict(cif_io)
+
+            # Populate protein_info using the helper function
+            protein_info['Título/Descripción'] = get_cif_value(cif_dict_data, '_entry.title')
             
-            if match_single:
-                value = match_single.group(2).strip()
-                if not value.startswith('_') or value == tag:
-                    return value
-                else:
-                    return "No disponible"
+            # Molecule name - often found in _entity.pdbx_description or _entity_poly.pdbx_entity_type
+            # MMCIF2Dict structure can be tricky, often a list of dictionaries if multiple entries
+            molecule_names = []
+            if '_entity.pdbx_description' in cif_dict_data:
+                # This is usually a list of descriptions for each entity
+                molecule_names.extend(get_cif_value(cif_dict_data, '_entity.pdbx_description').split(', '))
+            protein_info['Nombre de la molécula'] = ', '.join(list(set(molecule_names))) if molecule_names else 'No disponible'
 
-            return "No disponible"
+            protein_info['Clasificación/Palabras clave'] = get_cif_value(cif_dict_data, '_struct_keywords.pdbx_keywords')
+            if protein_info['Clasificación/Palabras clave'] == 'No disponible':
+                protein_info['Clasificación/Palabras clave'] = get_cif_value(cif_dict_data, '_entry.descr_gen') # Fallback
 
-        protein_info["Título/Descripción"] = get_cif_value(file_data, "_struct.title")
-        protein_info["Nombre de la Molécula"] = get_cif_value(file_data, "_entity.pdbx_description")
-        protein_info["Clasificación/Palabras Clave"] = get_cif_value(file_data, "_struct_keywords.pdbx_keywords")
-        protein_info["Método Experimental"] = get_cif_value(file_data, "_exptl.method")
+            protein_info['Método experimental'] = get_cif_value(cif_dict_data, '_exptl.method')
 
-        organism_scientific_nat = get_cif_value(file_data, "_entity_src_nat.organism_scientific")
-        organism_scientific_gen = get_cif_value(file_data, "_entity_src_gen.organism_scientific")
+            # Organism - typically found in _entity_src_gen or _entity_src_nat
+            organism_scientific = get_cif_value(cif_dict_data, '_entity_src_gen.pdbx_organism_scientific')
+            if organism_scientific == 'No disponible':
+                organism_scientific = get_cif_value(cif_dict_data, '_entity_src_nat.pdbx_organism_scientific')
+            protein_info['Organismo'] = organism_scientific
 
-        if organism_scientific_nat != "No disponible":
-            protein_info["Organismo"] = organism_scientific_nat
-        elif organism_scientific_gen != "No disponible":
-            protein_info["Organismo"] = organism_scientific_gen
+        except Exception as e:
+            st.warning(f"Error parsing CIF file with Bio.PDB: {e}")
 
+    # Display protein information (after potential API update or CIF parsing)
     for key, value in protein_info.items():
-        st.write(f"**{key}:** {value}")
+        st.write(f"**{key}**: {value}")
+
 else:
     st.subheader("Proyecto final - Bioinformática")
     st.write("""
