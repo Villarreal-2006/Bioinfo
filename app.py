@@ -55,11 +55,9 @@ if uploaded_file is not None:
 
         # Parse PDB file if extension is .pdb
         if file_extension == '.pdb':
-            st.write(f'Analizando archivo PDB: {uploaded_file.name}')
             pdb_parser = PDBParser()
             try:
                 structure = pdb_parser.get_structure('protein', file_path)
-                st.write(f"Analisis con éxito del PDB: {uploaded_file.name}")
                 st.write(f"Numero de modelos: {len(structure)}")
                 for model in structure:
                     st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
@@ -71,11 +69,9 @@ if uploaded_file is not None:
 
         # Parse CIF file if extension is .cif
         elif file_extension == '.cif':
-            st.write(f'Analizando archivo CIF: {uploaded_file.name}')
             cif_parser = MMCIFParser()
             try:
                 structure_cif = cif_parser.get_structure('protein_cif', file_path)
-                st.write(f"Analisis con éxito del CIF: {uploaded_file.name}")
                 st.write(f"Number of models: {len(structure_cif)}")
                 for model in structure_cif:
                     st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
