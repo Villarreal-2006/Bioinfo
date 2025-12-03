@@ -38,9 +38,9 @@ if uploaded_file is not None:
     st.write("Utiliza el menu para cambiar la representación molecular.")
 
     st.subheader(":page_facing_up: Vista previa del archivo:")
-    st.code("\n".join(file_data.split("\n")[:30]))
+    st.sidebar.code("\n".join(file_data.split("\n")))
     
-    st.sidebar.subheader('Información de la proteína')
+    st.subheader('Información de la proteína')
     
     file_extension = os.path.splitext(uploaded_file.name)[1].lower()
 
@@ -48,15 +48,15 @@ if uploaded_file is not None:
         file_path = os.path.join(tmpdir, uploaded_file.name)
         with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
-        st.sidebar.success(f'Analizado y guardado con éxito: {uploaded_file.name}')
+        st.success(f'Analizado y guardado con éxito: {uploaded_file.name}')
 
         if file_extension == '.pdb':
             pdb_parser = PDBParser()
             try:
                 structure = pdb_parser.get_structure('protein', file_path)
-                st.sidebar.write(f"Numero de modelos: {len(structure)}")
+                st.write(f"Numero de modelos: {len(structure)}")
                 for model in structure:
-                    st.sidebar.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
+                    st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
                     for chain in model:
                         st.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
 
@@ -67,9 +67,9 @@ if uploaded_file is not None:
             cif_parser = MMCIFParser()
             try:
                 structure_cif = cif_parser.get_structure('protein_cif', file_path)
-                st.sidebar.write(f"Number of models: {len(structure_cif)}")
+                st.write(f"Number of models: {len(structure_cif)}")
                 for model in structure_cif:
-                    st.sidebar.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
+                    st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
                     for chain in model:
                         st.sidebar.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
 
