@@ -1,6 +1,8 @@
 
 import streamlit as st
 from visualizador import ProteinVisualizer
+from Bio.PDB import PDBParser
+from Bio.PDB import MMCIFParser
 
 st.set_page_config(page_title="Visualizador de proteínas - Bioinformática", page_icon=":microscope:")
 
@@ -14,10 +16,8 @@ if uploaded_file is not None:
     file_extension = uploaded_file.name.split('.')[-1]
     file_data = uploaded_file.read().decode("utf-8")
 
-    # 3D Molecular Visualization
     st.subheader(":dna: Visualización 3D:")
 
-    # Dropdown for visualization style
     style_options = ["Cartoon", "Stick", "Sphere"]
     style = st.radio(
         label="Visualization",
@@ -38,6 +38,35 @@ if uploaded_file is not None:
 
     st.subheader(":page_facing_up: Vista previa del archivo:")
     st.code("\n".join(file_data.split("\n")[:20]))
+    
+    st.subheader('Información de la proteína')
+    if file_extension== 'pdb':
+        try:
+            structure = pdb_parser.get_structure('protein', uploaded_file)
+            st.write(f"Successfully parsed PDB file: {pdb_file_name}")
+            st.write(f"Numero de modelos: {len(structure)}")
+            for model in structure:
+                st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
+                for chain in model:
+                    st.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
+        except FileNotFoundError:
+            st.write(f"Error: Archivo PDB '{pdb_file_name}' no encontrado")
+        except Exception as e:
+            st.write(f"Error: {e}")
+    elif file_extension == "cif":
+        try:
+            structure_cif = cif_parser.get_structure('protein_cif', uploaded_file)
+            st.write(f"Successfully parsed CIF file: {cif_file_name}")
+            st.write(f"Numero de modelos: {len(structure_cif)}")
+            for model in structure_cif:
+                st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
+                for chain in model:
+                    st.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
+        
+        except FileNotFoundError:
+            st.write(f"Error: Archivo CIF '{cif_file_name}' no encontrado.")
+        except Exception as e:
+            st.write(f"Error: {e}")
 else:
     st.write("""
         Realizado por Diana Mariella Villarreal Lopez & Jose Eduardo Mungaray Martinez
