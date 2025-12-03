@@ -33,7 +33,7 @@ if uploaded_file is not None:
     st.subheader(":gear: Controles:")
     st.write("Rotar: Click izquierdo")
     st.write("Zoom: Shift + Click derecho o Scroll")
-    st.write("Movimiento: Control + Click derecho")
+    st.write("Movimiento: Control + Click izquierdo")
     st.write("Utiliza el menu para cambiar la representación molecular.")
 
     st.subheader(":page_facing_up: Vista previa del archivo:")
