@@ -41,9 +41,8 @@ if uploaded_file is not None:
     st.subheader(":page_facing_up: Vista previa del archivo:")
     st.code("\n".join(file_data.split("\n")[:30]))
     
-    st.subheader('Información de la proteína')
+    st.sidebar.subheader('Información de la proteína')
     
-    # Get the file extension to determine the parser
     file_extension = os.path.splitext(uploaded_file.name)[1].lower()
 
     # Create a temporary directory and save the uploaded file
@@ -51,16 +50,16 @@ if uploaded_file is not None:
         file_path = os.path.join(tmpdir, uploaded_file.name)
         with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
-        st.success(f'Analizado y guardado con éxito: {uploaded_file.name}')
+        st.sidebar.success(f'Analizado y guardado con éxito: {uploaded_file.name}')
 
         # Parse PDB file if extension is .pdb
         if file_extension == '.pdb':
             pdb_parser = PDBParser()
             try:
                 structure = pdb_parser.get_structure('protein', file_path)
-                st.write(f"Numero de modelos: {len(structure)}")
+                st.sidebar.write(f"Numero de modelos: {len(structure)}")
                 for model in structure:
-                    st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
+                    st.sidebar.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
                     for chain in model:
                         st.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
 
@@ -72,11 +71,11 @@ if uploaded_file is not None:
             cif_parser = MMCIFParser()
             try:
                 structure_cif = cif_parser.get_structure('protein_cif', file_path)
-                st.write(f"Number of models: {len(structure_cif)}")
+                st.sidebar.write(f"Number of models: {len(structure_cif)}")
                 for model in structure_cif:
-                    st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
+                    st.sidebar.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
                     for chain in model:
-                        st.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
+                        st.sidebar.write(f"    Chain ID: {chain.id}, Numero de residuos: {len(chain)}")
 
             except Exception as e:
                 st.error(f"Error: {e}")
