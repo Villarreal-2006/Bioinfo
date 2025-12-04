@@ -10,10 +10,17 @@ import shutil
 
 st.set_page_config(page_title="Visualizador de proteínas - Bioinformática", page_icon=":microscope:")
 
+st.code("""
+[theme]
+primaryColor="#70587C"
+backgroundColor="#c8b8db"
+secondaryBackgroundColor="#502f4c"
+textColor="#000000"
+font="monospace"
+""")
 st.title(":microscope: Visualizador de proteínas - Bioinformática")
 st.write("Sube el archivo **CIF o PDB** para visualizar su estructura molecular, o introduce un ID de PDB.")
 
-# New input method: PDB ID
 pdb_id_input = st.text_input("Ingresa un ID de PDB (ej. 1FAT, 2PLB):", "")
 use_example = st.button("Ver ejemplo (1FAT)")
 
@@ -25,9 +32,8 @@ pdb_id = None
 if use_example:
     pdb_id = "1FAT"
 elif pdb_id_input:
-    pdb_id = pdb_id_input.upper() # PDB IDs are usually uppercase
+    pdb_id = pdb_id_input.upper()
 
-# Fallback to file uploader if no PDB ID and no example button clicked
 uploaded_file = st.file_uploader("O sube tu propio archivo:", type=["pdb", "cif"])
 
 if uploaded_file is not None:
@@ -36,13 +42,10 @@ if uploaded_file is not None:
     file_data = uploaded_file.read().decode("utf-8")
     st.success(f"Archivo subido: {file_name}")
 elif pdb_id:
-    # Try to download the PDB/CIF file
     pdb_list = PDBList()
     download_success = False
-    temp_dir = tempfile.mkdtemp() # Create a temporary directory for downloads
-
+    temp_dir = tempfile.mkdtemp()
     try:
-        # Try MMCIF first
         st.info(f"Intentando descargar {pdb_id} en formato CIF...")
         downloaded_path = pdb_list.retrieve_pdb_file(pdb_id, pdir=temp_dir, file_format='mmcif')
         if downloaded_path and os.path.exists(downloaded_path):
@@ -60,7 +63,6 @@ elif pdb_id:
 
     if not download_success:
         try:
-            # Then try PDB
             st.info(f"Intentando descargar {pdb_id} en formato PDB...")
             downloaded_path = pdb_list.retrieve_pdb_file(pdb_id, pdir=temp_dir, file_format='pdb')
             if downloaded_path and os.path.exists(downloaded_path):
@@ -76,12 +78,11 @@ elif pdb_id:
         except Exception as e_pdb:
             st.error(f"Error al descargar PDB para {pdb_id}: {e_pdb}")
 
-    # Clean up the temporary directory
     shutil.rmtree(temp_dir)
 
     if not download_success:
         st.error(f"No se pudo descargar la proteína {pdb_id} en ningún formato. Por favor, verifica el ID o intenta subir un archivo.")
-        file_data = None # Ensure file_data is None if both fail
+        file_data = None
 
 
 if file_data is not None:
@@ -106,21 +107,17 @@ if file_data is not None:
     st.write("Utiliza el menu para cambiar la representación molecular.")
 
     st.sidebar.subheader(":page_facing_up: Vista previa del archivo:")
-    # Display only a portion of the file data for preview
     st.sidebar.code("\n".join(file_data.split("\n")[:20]))
 
     st.subheader('Información de la proteína')
-
-    # Create a temporary file to parse with Bio.PDB
     with tempfile.TemporaryDirectory() as tmpdir:
-        # Determine the file path for saving
         if file_name:
             temp_file_path = os.path.join(tmpdir, file_name)
         else:
-            # If it's an uploaded file without a name, use a generic name
+
             temp_file_path = os.path.join(tmpdir, f"temp_protein.{file_extension}")
 
-        with open(temp_file_path, "w") as f: # Use "w" for text data
+        with open(temp_file_path, "w") as f:
             f.write(file_data)
         st.success(f'Analizando: {file_name if file_name else "archivo subido"}')
 
@@ -152,7 +149,7 @@ if file_data is not None:
         else:
             st.warning("Formato de archivo no soportado para análisis detallado (solo PDB y CIF).")
 else:
-    if not pdb_id and not pdb_id_input and uploaded_file is None: # Only show this if nothing was provided
+    if not pdb_id and not pdb_id_input and uploaded_file is None:
         st.write("""
             Realizado por Diana Mariella Villarreal Lopez & Jose Eduardo Mungaray Martinez
         """)
