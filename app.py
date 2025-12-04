@@ -128,7 +128,7 @@ if file_data is not None:
             cif_parser = MMCIFParser()
             try:
                 structure_cif = cif_parser.get_structure('protein_cif', temp_file_path)
-                st.write(f"Number of models: {len(structure_cif)}")
+                st.write(f"Numero de modelos: {len(structure_cif)}")
                 for model in structure_cif:
                     st.write(f"  Model ID: {model.id}, Numero de cadenas: {len(model)}")
                     for chain in model:
