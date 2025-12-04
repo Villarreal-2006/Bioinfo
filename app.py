@@ -13,8 +13,8 @@ st.set_page_config(page_title="Visualizador de proteínas - Bioinformática", pa
 st.code("""
 [theme]
 primaryColor="#70587C"
-backgroundColor="#c8b8db"
-secondaryBackgroundColor="#502f4c"
+backgroundColor="#C8B8DB"
+secondaryBackgroundColor="#F9F4F5"
 textColor="#000000"
 font="monospace"
 """)
