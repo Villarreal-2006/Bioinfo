@@ -14,7 +14,6 @@ st.title(":microscope: Visualizador de proteínas - Bioinformática")
 st.write("Sube el archivo **CIF o PDB** para visualizar su estructura molecular, o introduce un ID de PDB.")
 
 pdb_id_input = st.text_input("Ingresa un ID de PDB (ej. 1FAT, 2PLB):", "")
-use_example = st.button("Ver ejemplo (1FAT)")
 
 file_data = None
 file_extension = None
