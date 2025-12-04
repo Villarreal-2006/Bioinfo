@@ -21,9 +21,7 @@ file_extension = None
 file_name = None
 pdb_id = '1FAT'
 
-if use_example:
-    pdb_id = "1FAT"
-elif pdb_id_input:
+if pdb_id_input:
     pdb_id = pdb_id_input.upper()
 
 uploaded_file = st.file_uploader("O sube tu propio archivo:", type=["pdb", "cif"])
