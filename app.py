@@ -10,14 +10,6 @@ import shutil
 
 st.set_page_config(page_title="Visualizador de proteínas - Bioinformática", page_icon=":microscope:")
 
-st.code("""
-[theme]
-primaryColor="#70587C"
-backgroundColor="#C8B8DB"
-secondaryBackgroundColor="#F9F4F5"
-textColor="#000000"
-font="monospace"
-""")
 st.title(":microscope: Visualizador de proteínas - Bioinformática")
 st.write("Sube el archivo **CIF o PDB** para visualizar su estructura molecular, o introduce un ID de PDB.")
 
