@@ -24,6 +24,7 @@ if pdb_id_input:
     pdb_id = pdb_id_input.upper()
 
 uploaded_file = st.file_uploader("O sube tu propio archivo:", type=["pdb", "cif"])
+st.write('Proteína visualizada al iniciar programa: 1FAT - LECTIN')
 
 if uploaded_file is not None:
     file_name = uploaded_file.name
