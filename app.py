@@ -19,7 +19,7 @@ use_example = st.button("Ver ejemplo (1FAT)")
 file_data = None
 file_extension = None
 file_name = None
-pdb_id = None
+pdb_id = '1FAT'
 
 if use_example:
     pdb_id = "1FAT"
